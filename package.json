@@ -1,0 +1,17 @@
+{
+  "name": "the-word-dico-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "lint" : "eslint *.js --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^6.1.0",
+    "telebot": "^1.2.6"
+  }
+}
