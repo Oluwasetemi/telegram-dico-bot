@@ -1,10 +1,15 @@
 require('dotenv').config({ path: 'variable.env' });
+const http = require('http');
 const TeleBot = require('telebot');
 const bot = new TeleBot(process.env.TOKEN);
 const { get } = require('axios');
 let url = 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/';
 let definition = '';
 let examples = '';
+
+const server = http.createServer((req, res) => {
+    res.end('Telegram Bot is Live 🔥');
+});
 
 bot.on('/hello', msg => {
     return bot.sendMessage(
@@ -32,12 +37,10 @@ bot.on('text', msg => {
                 console.log('working');
                 if (response.status === 200) {
                     const { data } = response;
-                    definition =
-            data.results[0].lexicalEntries[0]['entries'][0].senses[0]
-                .definitions[0];
+                    definition =            data.results[0].lexicalEntries[0]['entries'][0].senses[0].definitions[0] || 'no results';
                     examples =
             data.results[0].lexicalEntries[0]['entries'][0].senses[0]
-                .examples[0].text;
+                .examples[0].text || 'no results';
                     return bot.sendMessage(
                         msg.from.id,
                         `📚Definition: ${definition} \n 🆒Examples: ${examples} \n`
@@ -51,3 +54,9 @@ bot.on('text', msg => {
 });
 
 bot.start();
+
+server.listen(80, (err) => {
+    if (!err) {
+        console.log('server is listening on port 80');
+    }
+});
