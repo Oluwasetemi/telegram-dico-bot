@@ -55,7 +55,11 @@ bot.on('text', msg => {
         }
       })
       .catch(err => {
-        return console.log(err);
+        console.log(err.message);
+        return bot.sendMessage(
+          msg.from.id,
+          `Could you please search for another word!!**${word}** cannot be found in my brain.  🆒 I am so very cool 😭 \n`
+        );
       });
   }
 });
