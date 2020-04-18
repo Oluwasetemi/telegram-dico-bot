@@ -1,9 +1,9 @@
-require('dotenv').config({ path: 'variable.env' });
+require('dotenv').config();
 const http = require('http');
 const TeleBot = require('telebot');
 const bot = new TeleBot(process.env.TOKEN);
 const { get } = require('axios');
-let url = 'https://od-api.oxforddictionaries.com:443/api/v1/entries/en/';
+let url = 'https://od-api.oxforddictionaries.com/api/v2/entries/en-gb/';
 let definition = '';
 let examples = '';
 
@@ -23,45 +23,48 @@ bot.on('/hello', msg => {
   );
 });
 
-bot.on('text', msg => {
+bot.on('text', async (msg) => {
   let word = msg.text.trim().toLowerCase();
   if (word !== '/hello' && word !== '/about') {
-    get(`${url}${word}`, {
-      headers: {
-        app_id: process.env.APPID,
-        app_key: process.env.APPKEY,
-      },
-    })
-      .then(response => {
-        // console.log('working');
-        if (response.status === 200) {
-          const { data } = response;
-          definition =
-            data.results[0].lexicalEntries[0]['entries'][0].senses[0]
-              .definitions[0] || 'no results';
-          examples =
-            data.results[0].lexicalEntries[0]['entries'][0].senses[0]
-              .examples[0].text || 'no results';
-          return bot.sendMessage(
-            msg.from.id,
-            `Here is the result for ${word.toUpperCase()}
-📚Definition: ${definition}.\n
-🆒Examples: ${examples}.\n`
-          );
-        } else {
-          return bot.sendMessage(
-            msg.from.id,
-            `Could you please search for another word!!${word} cannot be found in my brain.  🆒 I am so very cool 😭 \n`
-          );
-        }
-      })
-      .catch(err => {
-        // console.log(err.message);
+    try {
+      const response = await get(`${url}${word}`, {
+        headers: {
+          app_id: process.env.APPID,
+          app_key: process.env.APPKEY,
+        },
+      });
+
+      if (response.status === 200) {
+        const { data } = response;
+        definition =
+              data.results[0].lexicalEntries[0]['entries'][0].senses[0]
+                .definitions[0] || 'no results';
+        examples =
+              data.results[0].lexicalEntries[0]['entries'][0].senses[0]
+                .examples[0].text || 'no results';
+
         return bot.sendMessage(
           msg.from.id,
-          `Could you please search for another word!!**${word}** cannot be found in my brain.  🆒 I am so very cool 😭 \n`
+          `
+          Here is the result for ${word.toUpperCase()}
+          \n📚Definition: ${definition}.\n
+          \n🆒Examples: ${examples}.\n
+          `
         );
-      });
+      } else {
+        return bot.sendMessage(
+          msg.from.id,
+          `Could you please search for another word!!${word} cannot be found in my brain.  🆒 I am so very cool 😭 \n`
+        );
+      }
+    }
+    catch (err) {
+      // console.log(err.message);
+      return bot.sendMessage(
+        msg.from.id,
+        `Could you please search for another word!!**${word}** cannot be found in my brain.  🆒 I am so very cool 😭 \n`
+      );
+    }
   }
 });
 
@@ -82,8 +85,8 @@ bot.on('/about', function(msg) {
 
 bot.start();
 
-server.listen(80, err => {
+server.listen(process.env.PORT || 4000, err => {
   if (!err) {
-    console.log('server is listening on port 80');
+    console.log(`server is listening on port http://localhost:${process.env.PORT || 4000}`);
   }
 });
