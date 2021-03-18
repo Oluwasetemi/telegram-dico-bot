@@ -5,4 +5,4 @@ Done! Congratulations on your new bot. You will find it at [@the_word_dico_bot](
 Use this token to access the HTTP API:
 ******
 
-For a description of the Bot API, see this page: https://core.telegram.org/bots/api
+For a [description of the Bot API](https://core.telegram.org/bots/api), see this page.
